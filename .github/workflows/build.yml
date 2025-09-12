@@ -10,6 +10,12 @@ jobs:
     name: Run on Orgeon Runner
     runs-on: [self-hosted, oregon] # Runs on your self-hosted runner
     steps:
+      - name: Fix permissions before checkout
+        run: sudo chown -R $USER:$USER $GITHUB_WORKSPACE
+
+      - name: Force delete previous build artifacts
+        run: sudo rm -rf $GITHUB_WORKSPACE/* || true
+
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -54,7 +60,7 @@ jobs:
             -v public:/volume \
             -v $(pwd)/public:/backup \
             alpine sh -c "cp -r /backup/* /volume/ && ls -la /volume/"
-  
+
           docker run --rm \
             -v patches:/volume \
             -v $(pwd)/patches:/backup \
@@ -63,16 +69,20 @@ jobs:
             -v models:/volume \
             -v $(pwd)/models:/backup \
             alpine sh -c "cp -r /backup/* /volume/ && ls -la /volume/"
-      
+
       - name: Build and Run Docker Containers
         run: |
           docker-compose up -d --force-recreate
-
 
   run-in-paris:
     name: Run on Paris Runner
     runs-on: [self-hosted, paris] # Runs on your self-hosted runner
     steps:
+      - name: Fix permissions before checkout
+        run: sudo chown -R $USER:$USER $GITHUB_WORKSPACE
+
+      - name: Force delete previous build artifacts
+        run: sudo rm -rf $GITHUB_WORKSPACE/* || true
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -117,7 +127,7 @@ jobs:
             -v public:/volume \
             -v $(pwd)/public:/backup \
             alpine sh -c "cp -r /backup/* /volume/ && ls -la /volume/"
-  
+
           docker run --rm \
             -v patches:/volume \
             -v $(pwd)/patches:/backup \
@@ -126,7 +136,7 @@ jobs:
             -v models:/volume \
             -v $(pwd)/models:/backup \
             alpine sh -c "cp -r /backup/* /volume/ && ls -la /volume/"
-      
+
       - name: Build and Run Docker Containers
         run: |
           docker-compose up -d --force-recreate
